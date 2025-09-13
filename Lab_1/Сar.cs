@@ -8,69 +8,41 @@ namespace Lab_1
 {
     internal class Car
     {
-        string _markAndModel;
-        Color _color;
-        float _horsePower;
-        decimal _weight;
-        double _milage;
-        double _fuelCapacity;
-        double _currentFuel;
-        DateTime _productionDate;
-        double _fuelConsumptionPer100km; //new
+        public string markAndModel;
+        public Color color;
+        public float horsePower;
+        public decimal weight;
+        public double milage;
+        public double fuelCapacity;
+        public double currentFuel;
+        public DateTime productionDate;
+        public double fuelConsumptionPer100km; //new
 
-        bool _isStarted = false;
-        double _currentSpeed = 0;
-        double _maxSpeed;
+        bool isStarted = false;
+        public double currentSpeed = 0;
+        public double maxSpeed;
 
-        public string MarkAndModel { get { return _markAndModel; } set { _markAndModel = value; } }
-        public Color Color { get { return _color; } set { _color = value; } }
-        public float HorsePower { get { return _horsePower; } set { _horsePower = value; } }
-        public decimal Weight { get { return _weight; } set { _weight = value; } }
-        public double Milage { get { return _milage; } set { _milage = value; } }
-        public double FuelCapacity { get { return _fuelCapacity; } set { _fuelCapacity = value; } }
-        public double CurrentFuel { get { return _currentFuel; } set { _currentFuel = value; } }
-        public double CurrentSpeed { get { return _currentSpeed; } set { _currentSpeed = value; } }
-        public DateTime ProductionDate { get { return _productionDate; } set { _productionDate = value; } }
-        public double MaxSpeed { get { return _maxSpeed; } set { _maxSpeed = value; } }
-        public double FuelConsumptionPer100km { get { return _fuelConsumptionPer100km; } set { _fuelConsumptionPer100km = value; } } //new
-
-        public Car(string markAndModel, Color color, float horsePower, decimal weight, double milage, double fuelConsumptionPer100km, double fuelCapacity, DateTime productiDate)
-        {
-            _markAndModel = markAndModel;
-            _color = color;
-            _horsePower = horsePower;
-            _weight = weight;
-            _milage = milage;
-            _fuelConsumptionPer100km = fuelConsumptionPer100km; //new
-            _fuelCapacity = fuelCapacity;
-            _currentFuel = fuelCapacity;
-
-            _maxSpeed = _horsePower / (float)_weight * 1000;
-            if (_maxSpeed < 50) _maxSpeed = 50;
-            _productionDate = productiDate;
-
-        }
 
         public string StartEnige()
         {
-            if (_isStarted)
+            if (isStarted)
             {
                 return "The car is already started.";
             }
-            if (_currentFuel <= 0)
+            if (currentFuel <= 0)
             {
                 return "Cannot start engine. The fuel tank is empty.";
             }
-            _isStarted = true;
+            isStarted = true;
             return "The car has started.";
         }
 
         public string StopEngine()
         {
-            if (_isStarted)
+            if (isStarted)
             {
-                _isStarted = false;
-                _currentSpeed = 0;
+                isStarted = false;
+                currentSpeed = 0;
                 return "The car has stopped.";
             }
             else
@@ -81,11 +53,11 @@ namespace Lab_1
 
         public string SpeedUp(double increment)
         {
-            if (!_isStarted)
+            if (!isStarted)
             {
                 return "The car is not started. Please start the engine first.";
             }
-            if (_currentFuel <= 0)
+            if (currentFuel <= 0)
             {
                 StopEngine();
                 return "Out of fuel! The car stopped. Please refuel.";
@@ -95,18 +67,18 @@ namespace Lab_1
                 return "Increment must be a positive value.";
             }
 
-            _currentSpeed += increment;
-            if (_currentSpeed > _maxSpeed)
+            currentSpeed += increment;
+            if (currentSpeed > maxSpeed)
             {
-                _currentSpeed = _maxSpeed;
-                return $"The car has reached its maximum speed of {_maxSpeed:F2} km/h."; //new
+                currentSpeed = maxSpeed;
+                return $"The car has reached its maximum speed of {maxSpeed:F2} km/h."; //new
             }
-            return $"The car's current speed is {_currentSpeed:F2} km/h.";
+            return $"The car's current speed is {currentSpeed:F2} km/h.";
         }
 
         public string SlowDown(double decrement)
         {
-            if (!_isStarted)
+            if (!isStarted)
             {
                 return "The car is not started. Please start the engine first.";
             }
@@ -114,13 +86,13 @@ namespace Lab_1
             {
                 return "Decrement must be a positive value.";
             }
-            _currentSpeed -= decrement;
-            if (_currentSpeed < 0)
+            currentSpeed -= decrement;
+            if (currentSpeed < 0)
             {
-                _currentSpeed = 0;
+                currentSpeed = 0;
                 return "The car has come to a complete stop.";
             }
-            return $"The car's current speed is {_currentSpeed:F2} km/h.";
+            return $"The car's current speed is {currentSpeed:F2} km/h.";
         }
 
         public string Refuel(double amount)
@@ -131,27 +103,27 @@ namespace Lab_1
             }
 
             double fuelAdded = 0;
-            if (_currentFuel + amount > _fuelCapacity)
+            if (currentFuel + amount > fuelCapacity)
             {
-                fuelAdded = _fuelCapacity - _currentFuel;
-                _currentFuel = _fuelCapacity;
-                return $"Refueled {fuelAdded:F2} liters. The tank is now full: {_currentFuel:F2} / {_fuelCapacity} liters.";
+                fuelAdded = fuelCapacity - currentFuel;
+                currentFuel = fuelCapacity;
+                return $"Refueled {fuelAdded:F2} liters. The tank is now full: {currentFuel:F2} / {fuelCapacity} liters.";
             }
             else
             {
-                _currentFuel += amount;
+                currentFuel += amount;
                 fuelAdded = amount;
-                return $"Refueled {fuelAdded:F2} liters. Current fuel: {_currentFuel:F2} / {_fuelCapacity} liters.";
+                return $"Refueled {fuelAdded:F2} liters. Current fuel: {currentFuel:F2} / {fuelCapacity} liters.";
             }
         }
 
         public string RideCar(double distanceDrivenKM)
         {
-            if (!_isStarted)
+            if (!isStarted)
             {
                 return "Cannot ride. The car is not started. Please start the engine first.";
             }
-            if (_currentSpeed <= 0)
+            if (currentSpeed <= 0)
             {
                 return "Cannot ride. The car is not moving. Increase speed first.";
             }
@@ -159,46 +131,46 @@ namespace Lab_1
             {
                 return "Driving distance must be positive.";
             }
-            if (_currentFuel <= 0)
+            if (currentFuel <= 0)
             {
                 StopEngine(); 
                 return "Out of fuel! The car has stopped. Please refuel.";
             }
 
 
-            double litersPerKM = _fuelConsumptionPer100km / 100.0; //new
+            double litersPerKM = fuelConsumptionPer100km / 100.0; //new
 
             double fuelConsumed = litersPerKM * distanceDrivenKM; //new
 
-            double timeInMinutes = (distanceDrivenKM / _currentSpeed) * 60.0; //new
+            double timeInMinutes = (distanceDrivenKM / currentSpeed) * 60.0; //new
 
 
-            if (fuelConsumed > _currentFuel)
+            if (fuelConsumed > currentFuel)
             {
-                double actualDistancePossible = _currentFuel / litersPerKM;
+                double actualDistancePossible = currentFuel / litersPerKM;
 
-                double actualTimePossible = (actualDistancePossible / _currentSpeed) * 60.0;
+                double actualTimePossible = (actualDistancePossible / currentSpeed) * 60.0;
 
-                _milage += actualDistancePossible;
-                _currentFuel = 0;
+                milage += actualDistancePossible;
+                currentFuel = 0;
                 StopEngine();
                 return $"Ran out of fuel after driving for {actualTimePossible:F2} minutes and {actualDistancePossible:F2} km. " +
-                       $"The car stopped. Total milage: {_milage:F2} km. Please refuel.";
+                       $"The car stopped. Total milage: {milage:F2} km. Please refuel.";
             }
             else
             {
-                _currentFuel -= fuelConsumed;
-                _milage += distanceDrivenKM;
-                return $"Drove for {timeInMinutes:F2} minutes ({distanceDrivenKM:F2} km) at {_currentSpeed:F2} km/h. " +
-                       $"Fuel consumed: {fuelConsumed:F2} liters. Remaining fuel: {_currentFuel:F2} / {_fuelCapacity} liters. " +
-                       $"Total milage: {_milage:F2} km.";
+                currentFuel -= fuelConsumed;
+                milage += distanceDrivenKM;
+                return $"Drove for {timeInMinutes:F2} minutes ({distanceDrivenKM:F2} km) at {currentSpeed:F2} km/h. " +
+                       $"Fuel consumed: {fuelConsumed:F2} liters. Remaining fuel: {currentFuel:F2} / {fuelCapacity} liters. " +
+                       $"Total milage: {milage:F2} km.";
             }
         }
 
         public override string ToString()
         {
-            return $"Car: {_markAndModel}, Color: {_color}, HorsePower: {_horsePower}, Weight: {_weight}, Milage: {_milage:F2} km, " +
-                   $"MaxSpeed: {_maxSpeed:F2} km/h, Fuel: {_currentFuel:F2}/{_fuelCapacity} liters.";
+            return $"Car: {markAndModel}, Color: {color}, HorsePower: {horsePower}, Weight: {weight}, Milage: {milage:F2} km, CurrentSpeed: {currentSpeed:F2} km/h ," +
+                   $"MaxSpeed: {maxSpeed:F2} km/h, Fuel: {currentFuel:F2}/{fuelCapacity} liters. Fuel per 100km: {fuelConsumptionPer100km:F2} liters.";
         }
     }
 }

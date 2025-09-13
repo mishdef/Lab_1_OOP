@@ -63,26 +63,47 @@ namespace Lab_1
 
         static public void AddSeedData() //cheat code
         {
-            if (cars.Length >= maxCapacity) return;
-
-            Car[] seedData = new Car[]
+            if (cars.Length >= maxCapacity)
             {
-                new Car("Audi A4", Color.Red, 150, 1550, 12000, 10, 60, new DateTime(2022, 1, 1)),
-                new Car("Audi A6", Color.Black, 250, 1800, 0, 14,70, new DateTime(2020, 6, 12)),
-                new Car("BMW M3", Color.Blue, 420, 1600, 85000, 16, 63, new DateTime(2008, 5, 17)),
-                new Car("Mini Classic", Color.Green, 40, 650, 0, 6, 30, new DateTime(1995, 3, 4)),
-                new Car("Ford F-150", Color.Black, 400, 2500, 25000, 24, 120, new DateTime(2021, 1, 1))
-            };
-
-            seedData = seedData.Take(maxCapacity - cars.Length).ToArray();
-
-            Console.WriteLine(seedData.Length + " cars added.");
-            foreach (var car in seedData)
-            {
-                AddCar(car.MarkAndModel, car.Color, car.HorsePower, car.Weight, car.Milage, car.FuelConsumptionPer100km, car.FuelCapacity, car.ProductionDate);
+                Console.WriteLine("Storage is full, cannot add seed data.");
+                return;
             }
 
-            Console.WriteLine("CHEAT CODE ACTICATED: Seed data added.");
+            var seedDataItems = new[]
+            {
+                new { MarkAndModel = "Audi A4", Color = Color.Red, HorsePower = 150f, Weight = 1550m, Milage = 12000.0, FuelConsumptionPer100km = 10.0, FuelCapacity = 60.0, ProductionDate = new DateTime(2022, 1, 1) },
+                new { MarkAndModel = "Audi A6", Color = Color.Black, HorsePower = 250f, Weight = 1800m, Milage = 0.0, FuelConsumptionPer100km = 14.0, FuelCapacity = 70.0, ProductionDate = new DateTime(2020, 6, 12) },
+                new { MarkAndModel = "BMW M3", Color = Color.Blue, HorsePower = 420f, Weight = 1600m, Milage = 85000.0, FuelConsumptionPer100km = 16.0, FuelCapacity = 63.0, ProductionDate = new DateTime(2008, 5, 17) },
+                new { MarkAndModel = "Mini Classic", Color = Color.Green, HorsePower = 40f, Weight = 650m, Milage = 0.0, FuelConsumptionPer100km = 6.0, FuelCapacity = 30.0, ProductionDate = new DateTime(1995, 3, 4) },
+                new { MarkAndModel = "Ford F-150", Color = Color.Black, HorsePower = 400f, Weight = 2500m, Milage = 25000.0, FuelConsumptionPer100km = 24.0, FuelCapacity = 120.0, ProductionDate = new DateTime(2021, 1, 1) }
+            };
+
+            int initialCarsCount = cars.Length;
+            int carsAddedCount = 0;
+
+            foreach (var item in seedDataItems)
+            {
+                if (cars.Length < maxCapacity) 
+                {
+                    AddCar(item.MarkAndModel, item.Color, item.HorsePower, item.Weight, item.Milage, item.FuelConsumptionPer100km, item.FuelCapacity, item.ProductionDate);
+                    carsAddedCount++;
+                }
+                else
+                {
+                    Console.WriteLine("Storage became full. Not all seed data cars were added.");
+                    break;
+                }
+            }
+
+            if (carsAddedCount > 0)
+            {
+                Console.WriteLine($"{carsAddedCount} cars added from seed data.");
+                Console.WriteLine("CHEAT CODE ACTIVATED: Seed data added.");
+            }
+            else if (initialCarsCount == cars.Length)
+            {
+                Console.WriteLine("No seed data cars could be added due to storage capacity.");
+            }
         }
 
         static void DemonstrateBehaviour()
@@ -120,18 +141,30 @@ namespace Lab_1
             Color color = (Color)InputInt("Choose the cars color:\n0. Red\n1. Blue\n2. Green\n3. Black\n4. White\n5. Grey\nYour choice: ", InputType.With, 0, 5);
             float horsePower = (float)InputDouble("Enter the car's horse power: ", InputType.With, 20, 2000);
             decimal weight = (decimal)InputDouble("Enter the car's weight (kg): ", InputType.With, 400, 8000);
-            double milage = InputDouble("Enter the cars milage (km): ", InputType.With, 0, 2000000);             
+            double milage = InputDouble("Enter the cars milage (km): ", InputType.With, 0, 2000000);
             double fuelConsumption = InputDouble("Enter the cars fuel consumption (l/100km): ", InputType.With, 0, 50);
             double fuelCapacity = InputDouble("Enter the cars fuel capacity (l): ", InputType.With, 20, 200);
             DateTime dateTime = InputDateTime("Enter the cars production date: ", new DateTime(1886, 1, 1), DateTime.Now);
-                                                                                                                           
+
             Console.WriteLine(AddCar(markAndModel, color, horsePower, weight, milage, fuelConsumption, fuelCapacity, dateTime));
         }
 
         static string AddCar(string markAndModel, Color color, float horsePower, decimal weight, double milage, double fuelConsumption, double fuelCapacity, DateTime productiDate)
         {
             Array.Resize(ref cars, cars.Length + 1);
-            cars[cars.Length - 1] = new Car(markAndModel, color, horsePower, weight, milage, fuelConsumption, fuelCapacity, productiDate);
+            cars[cars.Length - 1] = new Car();
+            cars[cars.Length - 1].markAndModel = markAndModel;
+            cars[cars.Length - 1].color = color;
+            cars[cars.Length - 1].horsePower = horsePower;
+            cars[cars.Length - 1].weight = weight;
+            cars[cars.Length - 1].milage = milage;
+            cars[cars.Length - 1].fuelConsumptionPer100km = fuelConsumption; //new
+            cars[cars.Length - 1].fuelCapacity = fuelCapacity;
+            cars[cars.Length - 1].currentFuel = fuelCapacity;
+
+            cars[cars.Length - 1].maxSpeed = cars[cars.Length - 1].horsePower / (float)cars[cars.Length - 1].weight * 1000;
+            if (cars[cars.Length - 1].maxSpeed < 50) cars[cars.Length - 1].maxSpeed = 50;
+            cars[cars.Length - 1].productionDate = productiDate;
             return "Car added successfully";
         }
 
@@ -168,21 +201,21 @@ namespace Lab_1
                 PrintHeader();
                 for (int i = 0; i < cars.Length; i++)
                 {
-                    if (cars[i].MarkAndModel.ToLower().Contains(text.ToLower()))
+                    if (cars[i].markAndModel.ToLower().Contains(text.ToLower()))
                     {
                         PrintCarLine(i + 1, cars[i]);
                         anyFound = true;
                     }
                 }
             }
-            else 
+            else
             {
                 int colorVal = InputInt("Choose color:\n0. Red\n1. Blue\n2. Green\n3. Black\n4. White\n5. Grey\nYour choice: ", InputType.With, 0, 5);
                 Color searchColor = (Color)colorVal;
                 PrintHeader();
                 for (int i = 0; i < cars.Length; i++)
                 {
-                    if (cars[i].Color == searchColor)
+                    if (cars[i].color == searchColor)
                     {
                         PrintCarLine(i + 1, cars[i]);
                         anyFound = true;
@@ -209,16 +242,16 @@ namespace Lab_1
 
             int choose = InputInt("Remove by:\n1. Mark and Model\n2. Color\n3. Index\nYour choice: ", InputType.With, 1, 3);
 
-            switch (choose) 
+            switch (choose)
             {
                 case 1:
                     string searchText = InputString("Enter search prompt of mark/model: ");
                     for (int i = 0; i < cars.Length; i++)
                     {
-                        if (cars[i].MarkAndModel.ToLower().Contains(searchText.ToLower()))
+                        if (cars[i].markAndModel.ToLower().Contains(searchText.ToLower()))
                         {
-                            if (removedNamesString == "") removedNamesString = cars[i].MarkAndModel;
-                            else removedNamesString += ", " + cars[i].MarkAndModel;
+                            if (removedNamesString == "") removedNamesString = cars[i].markAndModel;
+                            else removedNamesString += ", " + cars[i].markAndModel;
 
                             itemsRemovedCount++;
 
@@ -236,12 +269,10 @@ namespace Lab_1
                     Color searchColor = (Color)colorVal;
                     for (int i = 0; i < cars.Length; i++)
                     {
-                        if (cars[i].Color == searchColor)
+                        if (cars[i].color == searchColor)
                         {
-                            if (removedNamesString == "")
-                                removedNamesString = cars[i].MarkAndModel;
-                            else
-                                removedNamesString += ", " + cars[i].MarkAndModel;
+                            if (removedNamesString == "") removedNamesString = cars[i].markAndModel;
+                            else removedNamesString += ", " + cars[i].markAndModel;
 
                             itemsRemovedCount++;
 
@@ -272,14 +303,14 @@ namespace Lab_1
                         }
                         else
                         {
-                            removedNamesString = cars[indexToDelete - 1].MarkAndModel;
+                            removedNamesString = cars[indexToDelete - 1].markAndModel;
                             itemsRemovedCount = 1;
 
                             for (int i = indexToDelete - 1; i < cars.Length - 1; i++)
                             {
                                 cars[i] = cars[i + 1];
                             }
-                            break; 
+                            break;
                         }
                     } while (true);
                     break;
@@ -336,12 +367,12 @@ namespace Lab_1
                             Console.WriteLine(carSel.RideCar(distance));
                             break;
                         case 6:
-                            if (carSel.CurrentFuel >= carSel.FuelCapacity)
+                            if (carSel.currentFuel >= carSel.fuelCapacity)
                             {
                                 Console.WriteLine("Tank is full.");
                                 break;
                             }
-                            double maxAdd = carSel.FuelCapacity - carSel.CurrentFuel;
+                            double maxAdd = carSel.fuelCapacity - carSel.currentFuel;
                             double fuel = InputDouble($"Fuel to add (max {maxAdd:F1}): ", InputType.With, 0);
                             Console.WriteLine(carSel.Refuel(fuel));
                             break;
@@ -359,26 +390,28 @@ namespace Lab_1
 
         static void PrintHeader()
         {
+            DrawLine(142);
             Console.WriteLine("Index| Mark&Model           | Color  | HP   | Weight | Milage     | Cap    | Fuel   | Fuel per 100km | Speed  | Max speed | Date of production");
-            DrawLine(142, '-');
+            DrawLine(142);
         }
 
         static void PrintCarLine(int index, Car car)
         {
             Console.WriteLine(
                 $"{index,4} | " +
-                $"{car.MarkAndModel,-20} | " +
-                $"{car.Color,-6} | " +
-                $"{car.HorsePower,4} | " +
-                $"{car.Weight,6} | " +
-                $"{car.Milage,10:F1} | " +
-                $"{car.FuelCapacity,6:F1} | " +
-                $"{car.CurrentFuel,6:F1} | " +
-                $"{car.FuelConsumptionPer100km,14:F1} | " +
-                $"{car.CurrentSpeed,6:F1} | " +
-                $"{car.MaxSpeed,9:F1} | " +
-                $"{car.ProductionDate.ToString("yyyy-MM-dd")}"
+                $"{car.markAndModel,-20} | " +
+                $"{car.color,-6} | " +
+                $"{car.horsePower,4} | " +
+                $"{car.weight,6} | " +
+                $"{car.milage,10:F1} | " +
+                $"{car.fuelCapacity,6:F1} | " +
+                $"{car.currentFuel,6:F1} | " +
+                $"{car.fuelConsumptionPer100km,14:F1} | " +
+                $"{car.currentSpeed,6:F1} | " +
+                $"{car.maxSpeed,9:F1} | " +
+                $"{car.productionDate.ToString("yyyy-MM-dd")}"
                 );
+            DrawLine(142);
         }
     }
 }
